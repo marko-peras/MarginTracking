@@ -1,0 +1,136 @@
+﻿Commission;Category;Item;Margin
+U-0000000675-99999;Vehicle sale (outgoing invoice);Base vehicle;20000.00
+U-0000000675-99999;Vehicle sale (outgoing invoice);Preparation fee;500.00
+U-0000000675-99999;Vehicle sale (outgoing invoice);Discounts;-3000.00
+U-0000000675-99999;Vehicle purchase (incoming invoice);Purchase price;-16000.00
+U-0000000675-99999;Vehicle purchase (incoming invoice);Transport costs;-500.00
+U-0000000675-99999;Internal costs;Vehicle maintenance (internal invoice);-300.00
+U-0000000675-99999;Internal costs;Small repairs (internal invoice);-700.00
+U-0000000675-99999;Services;Battery charge (internal invoice);-300.00
+U-0000000675-99999;Services;Vehicle washing (internal invoice);-200.00
+U-0000000675-99999;Bonuses & Promotions;Toyota Used vehicle sale bonus (manual)     [EXPECTED];1000.00
+U-0000000675-99999;Other;Vehicle renting  (manual);300.00
+N-0000000566-99999;Vehicle sale (outgoing invoice);Base vehicle;30000.00
+N-0000000566-99999;Vehicle sale (outgoing invoice);Options;10000.00
+N-0000000566-99999;Vehicle sale (outgoing invoice);Accesories;5000.00
+N-0000000566-99999;Vehicle sale (outgoing invoice);Preparation fee;500.00
+N-0000000566-99999;Vehicle sale (outgoing invoice);Discounts;-3000.00
+N-0000000566-99999;Vehicle sale (outgoing invoice);Toyota summer promo     [EXPECTED];-3000.00
+N-0000000566-99999;Vehicle purchase (incoming invoice);Purchase price;-40000.00
+N-0000000566-99999;Vehicle purchase (incoming invoice);Transport costs;-500.00
+N-0000000566-99999;Internal costs;Accessories montage (internal invoice);-500.00
+N-0000000566-99999;Internal costs;Vehicle maintenance (internal invoice);-300.00
+N-0000000566-99999;Internal costs;Small repairs (internal invoice);-700.00
+N-0000000566-99999;Services;Battery charge (internal invoice);-300.00
+N-0000000566-99999;Services;Vehicle washing (internal invoice);-200.00
+N-0000000566-99999;Bonuses & Promotions;Toyota Bonus (manual)     [EXPECTED];2000.00
+N-0000000566-99999;Bonuses & Promotions;Toyota summer promo (importer credit note);3000.00
+N-0000000566-99999;Other;Vehicle renting  (manual);300.00
+U-0000000756-99999;Vehicle sale (outgoing invoice);Base vehicle;20000.00
+U-0000000756-99999;Vehicle sale (outgoing invoice);Preparation fee;500.00
+U-0000000756-99999;Vehicle sale (outgoing invoice);Discounts;-3000.00
+U-0000000756-99999;Vehicle purchase (incoming invoice);Purchase price;-16000.00
+U-0000000756-99999;Vehicle purchase (incoming invoice);Transport costs;-500.00
+U-0000000756-99999;Internal costs;Vehicle maintenance (internal invoice);-300.00
+U-0000000756-99999;Internal costs;Small repairs (internal invoice);-500.00
+U-0000000756-99999;Services;Battery charge (internal invoice);-300.00
+U-0000000756-99999;Services;Vehicle washing (internal invoice);-200.00
+U-0000000756-99999;Bonuses & Promotions;Toyota Used vehicle sale bonus (manual)     [EXPECTED];1000.00
+U-0000000756-99999;Other;Vehicle renting  (manual);300.00
+N-0000000867-99999;Vehicle sale (outgoing invoice);Base vehicle;30000.00
+N-0000000867-99999;Vehicle sale (outgoing invoice);Options;10000.00
+N-0000000867-99999;Vehicle sale (outgoing invoice);Accesories;5000.00
+N-0000000867-99999;Vehicle sale (outgoing invoice);Preparation fee;500.00
+N-0000000867-99999;Vehicle sale (outgoing invoice);Discounts;-3000.00
+N-0000000867-99999;Vehicle sale (outgoing invoice);Toyota summer promo     [EXPECTED];-3000.00
+N-0000000867-99999;Vehicle purchase (incoming invoice);Purchase price;-40000.00
+N-0000000867-99999;Vehicle purchase (incoming invoice);Transport costs;-500.00
+N-0000000867-99999;Internal costs;Accessories montage (internal invoice);-500.00
+N-0000000867-99999;Internal costs;Vehicle maintenance (internal invoice);-300.00
+N-0000000867-99999;Internal costs;Small repairs (internal invoice);-1000.00
+N-0000000867-99999;Services;Battery charge (internal invoice);-300.00
+N-0000000867-99999;Services;Vehicle washing (internal invoice);-200.00
+N-0000000867-99999;Bonuses & Promotions;Toyota Bonus (manual)     [EXPECTED];2000.00
+N-0000000867-99999;Bonuses & Promotions;Toyota summer promo (importer credit note);3000.00
+N-0000000867-99999;Other;Vehicle renting  (manual);300.00
+U-0000000321-99999;Vehicle sale (outgoing invoice);Base vehicle;20000.00
+U-0000000321-99999;Vehicle sale (outgoing invoice);Preparation fee;500.00
+U-0000000321-99999;Vehicle sale (outgoing invoice);Discounts;-3000.00
+U-0000000321-99999;Vehicle purchase (incoming invoice);Purchase price;-16500.00
+U-0000000321-99999;Vehicle purchase (incoming invoice);Transport costs;-500.00
+U-0000000321-99999;Internal costs;Vehicle maintenance (internal invoice);-300.00
+U-0000000321-99999;Internal costs;Small repairs (internal invoice);-300.00
+U-0000000321-99999;Services;Battery charge (internal invoice);-300.00
+U-0000000321-99999;Services;Vehicle washing (internal invoice);-200.00
+U-0000000321-99999;Bonuses & Promotions;Toyota Used vehicle sale bonus (manual)     [EXPECTED];1000.00
+U-0000000321-99999;Other;Vehicle renting  (manual);300.00
+N-0000000457-99999;Vehicle sale (outgoing invoice);Base vehicle;30000.00
+N-0000000457-99999;Vehicle sale (outgoing invoice);Options;10000.00
+N-0000000457-99999;Vehicle sale (outgoing invoice);Accesories;5000.00
+N-0000000457-99999;Vehicle sale (outgoing invoice);Preparation fee;500.00
+N-0000000457-99999;Vehicle sale (outgoing invoice);Discounts;-3000.00
+N-0000000457-99999;Vehicle sale (outgoing invoice);Toyota summer promo     [EXPECTED];-3000.00
+N-0000000457-99999;Vehicle purchase (incoming invoice);Purchase price;-40000.00
+N-0000000457-99999;Vehicle purchase (incoming invoice);Transport costs;-500.00
+N-0000000457-99999;Internal costs;Accessories montage (internal invoice);-1000.00
+N-0000000457-99999;Internal costs;Vehicle maintenance (internal invoice);-300.00
+N-0000000457-99999;Internal costs;Small repairs (internal invoice);-400.00
+N-0000000457-99999;Services;Battery charge (internal invoice);-300.00
+N-0000000457-99999;Services;Vehicle washing (internal invoice);-200.00
+N-0000000457-99999;Bonuses & Promotions;Toyota Bonus (manual)     [EXPECTED];2000.00
+N-0000000457-99999;Bonuses & Promotions;Toyota summer promo (importer credit note);3000.00
+N-0000000457-99999;Other;Vehicle renting  (manual);300.00
+U-0000000811-99999;Vehicle sale (outgoing invoice);Base vehicle;20000.00
+U-0000000811-99999;Vehicle sale (outgoing invoice);Preparation fee;500.00
+U-0000000811-99999;Vehicle sale (outgoing invoice);Discounts;-3000.00
+U-0000000811-99999;Vehicle purchase (incoming invoice);Purchase price;-15500.00
+U-0000000811-99999;Vehicle purchase (incoming invoice);Transport costs;-500.00
+U-0000000811-99999;Internal costs;Vehicle maintenance (internal invoice);-300.00
+U-0000000811-99999;Internal costs;Small repairs (internal invoice);-1000.00
+U-0000000811-99999;Services;Battery charge (internal invoice);-300.00
+U-0000000811-99999;Services;Vehicle washing (internal invoice);-200.00
+U-0000000811-99999;Bonuses & Promotions;Toyota Used vehicle sale bonus (manual)     [EXPECTED];1000.00
+U-0000000811-99999;Other;Vehicle renting  (manual);300.00
+N-0000000976-99999;Vehicle sale (outgoing invoice);Base vehicle;30000.00
+N-0000000976-99999;Vehicle sale (outgoing invoice);Options;10000.00
+N-0000000976-99999;Vehicle sale (outgoing invoice);Accesories;5000.00
+N-0000000976-99999;Vehicle sale (outgoing invoice);Preparation fee;500.00
+N-0000000976-99999;Vehicle sale (outgoing invoice);Discounts;-3000.00
+N-0000000976-99999;Vehicle sale (outgoing invoice);Toyota summer promo     [EXPECTED];-3000.00
+N-0000000976-99999;Vehicle purchase (incoming invoice);Purchase price;-40000.00
+N-0000000976-99999;Vehicle purchase (incoming invoice);Transport costs;-500.00
+N-0000000976-99999;Internal costs;Accessories montage (internal invoice);-500.00
+N-0000000976-99999;Internal costs;Vehicle maintenance (internal invoice);-300.00
+N-0000000976-99999;Internal costs;Small repairs (internal invoice);-100.00
+N-0000000976-99999;Services;Battery charge (internal invoice);-300.00
+N-0000000976-99999;Services;Vehicle washing (internal invoice);-200.00
+N-0000000976-99999;Bonuses & Promotions;Toyota Bonus (manual)     [EXPECTED];2000.00
+N-0000000976-99999;Bonuses & Promotions;Toyota summer promo (importer credit note);3000.00
+N-0000000976-99999;Other;Vehicle renting  (manual);300.00
+U-0000000545-99999;Vehicle sale (outgoing invoice);Base vehicle;20000.00
+U-0000000545-99999;Vehicle sale (outgoing invoice);Preparation fee;500.00
+U-0000000545-99999;Vehicle sale (outgoing invoice);Discounts;-3000.00
+U-0000000545-99999;Vehicle purchase (incoming invoice);Purchase price;-16500.00
+U-0000000545-99999;Vehicle purchase (incoming invoice);Transport costs;-500.00
+U-0000000545-99999;Internal costs;Vehicle maintenance (internal invoice);-500.00
+U-0000000545-99999;Internal costs;Small repairs (internal invoice);-300.00
+U-0000000545-99999;Services;Battery charge (internal invoice);-300.00
+U-0000000545-99999;Services;Vehicle washing (internal invoice);-200.00
+U-0000000545-99999;Bonuses & Promotions;Toyota Used vehicle sale bonus (manual)     [EXPECTED];1000.00
+U-0000000545-99999;Other;Vehicle renting  (manual);300.00
+N-0000000526-99999;Vehicle sale (outgoing invoice);Base vehicle;30000.00
+N-0000000526-99999;Vehicle sale (outgoing invoice);Options;10000.00
+N-0000000526-99999;Vehicle sale (outgoing invoice);Accesories;5000.00
+N-0000000526-99999;Vehicle sale (outgoing invoice);Preparation fee;500.00
+N-0000000526-99999;Vehicle sale (outgoing invoice);Discounts;-3000.00
+N-0000000526-99999;Vehicle sale (outgoing invoice);Toyota summer promo     [EXPECTED];-3000.00
+N-0000000526-99999;Vehicle purchase (incoming invoice);Purchase price;-40000.00
+N-0000000526-99999;Vehicle purchase (incoming invoice);Transport costs;-500.00
+N-0000000526-99999;Internal costs;Accessories montage (internal invoice);-500.00
+N-0000000526-99999;Internal costs;Vehicle maintenance (internal invoice);-300.00
+N-0000000526-99999;Internal costs;Small repairs (internal invoice);-500.00
+N-0000000526-99999;Services;Battery charge (internal invoice);-300.00
+N-0000000526-99999;Services;Vehicle washing (internal invoice);-200.00
+N-0000000526-99999;Bonuses & Promotions;Toyota Bonus (manual)     [EXPECTED];2000.00
+N-0000000526-99999;Bonuses & Promotions;Toyota summer promo (importer credit note);3000.00
+N-0000000526-99999;Other;Vehicle renting  (manual);300.00
