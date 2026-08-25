@@ -7,19 +7,253 @@
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <div id="app"><!-- Views rendered here by js/app.js --></div>
+  <div class="app">
+    <!-- Left rail -->
+    <aside class="rail">
+      <img src="img/sidebar.png" alt="Navigation" class="rail-img" />
+    </aside>
 
-  <!-- Add / Edit item popup -->
-  <div id="modal-overlay" class="modal-overlay" hidden>
-    <div id="item-modal" class="modal" role="dialog" aria-modal="true"></div>
+    <!-- Main content -->
+    <main class="main" id="main">
+      <!-- ============ LIST VIEW ============ -->
+      <section id="list-view" class="view">
+        <header class="topbar">
+          <div class="topbar-title">&larr;&nbsp; Modules&nbsp; /&nbsp; Sold vehicles</div>
+          <div class="kebab-wrap">
+            <button class="kebab-btn" id="list-kebab" aria-label="Menu">
+              <span></span><span></span><span></span>
+            </button>
+            <div class="kebab-menu" id="list-kebab-menu" hidden>
+              <button id="export-booking" class="kebab-item" disabled>Export booking data</button>
+            </div>
+          </div>
+        </header>
+
+        <div class="toolbar">
+          <div class="summary">
+            <span class="summary-item"><strong>Vehicles:</strong> <span id="sum-count">0</span></span>
+            <span class="summary-item"><strong>Total expected margin:</strong> <span id="sum-expected">0,00</span></span>
+            <span class="summary-item"><strong>Total effective margin:</strong> <span id="sum-effective">0,00</span></span>
+          </div>
+          <div class="toolbar-right">
+            <input type="text" id="search" class="search-input" placeholder="Search" />
+            <button id="filter-btn" class="btn-secondary">Filter</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="grid" id="vehicle-table">
+            <thead>
+              <tr>
+                <th class="col-check"><input type="checkbox" id="check-all" /></th>
+                <th>Vehicle</th>
+                <th>Type</th>
+                <th>Condition</th>
+                <th>Status</th>
+                <th>VIN</th>
+                <th>Commission</th>
+                <th>Body</th>
+                <th>Fuel</th>
+                <th>Date sold</th>
+                <th>Seller</th>
+                <th class="num">Expected Margin</th>
+                <th class="num">Effective Margin</th>
+                <th class="col-details"></th>
+              </tr>
+            </thead>
+            <tbody id="vehicle-body"></tbody>
+          </table>
+        </div>
+
+        <div class="pager">
+          <div class="pager-info" id="pager-info">0 - 0 / 0</div>
+          <div class="pager-controls">
+            <label for="page-size">Per page:</label>
+            <select id="page-size">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="All">All</option>
+            </select>
+            <button class="pg-btn" id="pg-first" title="First">&laquo;</button>
+            <button class="pg-btn" id="pg-prev" title="Previous">&lsaquo;</button>
+            <span class="pager-pages" id="pager-pages">1 / 1</span>
+            <button class="pg-btn" id="pg-next" title="Next">&rsaquo;</button>
+            <button class="pg-btn" id="pg-last" title="Last">&raquo;</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ DETAIL VIEW ============ -->
+      <section id="detail-view" class="view" hidden>
+        <header class="topbar">
+          <div class="topbar-title" id="detail-title">&larr;&nbsp; Modules&nbsp; /&nbsp; Sold vehicles</div>
+          <div class="topbar-actions">
+            <button id="add-new" class="btn-primary">+ Add new</button>
+            <div class="kebab-wrap">
+              <button class="kebab-btn" aria-label="Menu"><span></span><span></span><span></span></button>
+            </div>
+          </div>
+        </header>
+
+        <nav class="tabs" id="detail-tabs">
+          <span class="tab disabled">Info</span>
+          <span class="tab disabled">Media</span>
+          <span class="tab disabled">Details</span>
+          <span class="tab disabled">Publish</span>
+          <span class="tab disabled">Appraisal</span>
+          <span class="tab disabled">Commission</span>
+          <span class="tab disabled">Offers</span>
+          <span class="tab disabled">Contracts</span>
+          <span class="tab active">Margin</span>
+        </nav>
+
+        <div class="detail-body">
+          <table class="margin-table" id="margin-table">
+            <colgroup>
+              <col style="width:70%" />
+              <col style="width:15%" />
+              <col style="width:15%" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th class="item-col">
+                  <button class="chev" id="chev-all" aria-label="Expand all">&#9660;</button>
+                  Item
+                </th>
+                <th class="num">Expected Margin</th>
+                <th class="num">Effective Margin</th>
+              </tr>
+            </thead>
+            <tbody id="margin-body"></tbody>
+          </table>
+
+          <section class="history">
+            <div class="history-header" id="history-toggle">
+              <button class="chev" id="chev-history" aria-label="Toggle history">&#9654;</button>
+              <span class="history-title">History</span>
+            </div>
+            <div class="history-content" id="history-content" hidden>
+              <table class="history-table">
+                <thead>
+                  <tr><th>Date and time</th><th>User</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>10.08.2026 10:30</td>
+                    <td>John Doe</td>
+                    <td>Added: Bonuses &amp; Promotions - Toyota Used vehicle sale bonus (manual)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <!-- ============ FILTER SIDEBAR ============ -->
+    <aside class="filter-sidebar" id="filter-sidebar" hidden>
+      <div class="filter-head">
+        <span>Filters</span>
+        <button class="icon-btn" id="filter-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="filter-body">
+        <label>Type
+          <select id="f-type"></select>
+        </label>
+        <label>Condition
+          <select id="f-condition"></select>
+        </label>
+        <label>Status
+          <select id="f-status"></select>
+        </label>
+        <label>Body
+          <select id="f-body"></select>
+        </label>
+        <label>Fuel
+          <select id="f-fuel"></select>
+        </label>
+        <label>Seller
+          <select id="f-seller"></select>
+        </label>
+        <fieldset class="range">
+          <legend>Date sold</legend>
+          <label>From <input type="date" id="f-date-from" /></label>
+          <label>To <input type="date" id="f-date-to" /></label>
+        </fieldset>
+        <fieldset class="range">
+          <legend>Expected Margin</legend>
+          <label>From <input type="number" id="f-exp-from" /></label>
+          <label>To <input type="number" id="f-exp-to" /></label>
+        </fieldset>
+        <fieldset class="range">
+          <legend>Effective Margin</legend>
+          <label>From <input type="number" id="f-eff-from" /></label>
+          <label>To <input type="number" id="f-eff-to" /></label>
+        </fieldset>
+      </div>
+      <div class="filter-actions">
+        <button class="btn-secondary" id="filter-clear">Clear</button>
+        <button class="btn-primary" id="filter-apply">Apply</button>
+      </div>
+    </aside>
   </div>
 
-  <div id="toast" class="toast" hidden></div>
+  <!-- ============ ITEM POPUP ============ -->
+  <div class="modal-overlay" id="item-overlay" hidden>
+    <div class="modal" id="item-modal">
+      <div class="modal-head">
+        <span class="modal-title" id="item-modal-title">Add item</span>
+        <button class="icon-btn" id="item-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label class="field">Category*
+          <select id="i-category"></select>
+        </label>
+        <label class="field">Type
+          <select id="i-type">
+            <option value="Vehicle Revenue">Vehicle Revenue</option>
+            <option value="Vehicle Cost">Vehicle Cost</option>
+            <option value="Parts revenue">Parts revenue</option>
+            <option value="Parts cost">Parts cost</option>
+            <option value="Accrual revenue">Accrual revenue</option>
+            <option value="Accrual cost">Accrual cost</option>
+          </select>
+        </label>
+        <label class="field">Title*
+          <input type="text" id="i-title" maxlength="100" />
+        </label>
+        <label class="field">Description
+          <textarea id="i-description" maxlength="255" rows="3"></textarea>
+        </label>
+        <label class="field">Link to document
+          <input type="text" id="i-link" maxlength="255" />
+        </label>
+        <label class="field">Expected amount
+          <input type="number" id="i-expected" step="0.01" />
+        </label>
+        <label class="field">Effective amount
+          <input type="number" id="i-effective" step="0.01" />
+        </label>
+        <div class="field-error" id="item-error" hidden></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-danger" id="item-remove" hidden>Remove</button>
+        <span class="foot-spacer"></span>
+        <button class="btn-secondary" id="item-cancel">Cancel</button>
+        <button class="btn-primary" id="item-save">Save</button>
+      </div>
+    </div>
+  </div>
 
-  <script src="js/data.js"></script>
+  <!-- Hidden link used to download booking data -->
+  <a id="export-link" href="data/FACREC.xlsx" download hidden></a>
+
+  <script src="js/format.js"></script>
+  <script src="js/storage.js"></script>
   <script src="js/list.js"></script>
   <script src="js/detail.js"></script>
-  <script src="js/modal.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -1,180 +1,317 @@
-/* ==========================================================================
-   Margin Tracking App — Vehicle details view
-   ========================================================================== */
-
-const DetailView = (() => {
+// Vehicle details view (margin table) + Add/Edit item popup
+const DetailView = (function () {
   let commission = null;
-  let container = null;
-  let onBack = null;
-  let collapsed = {};        // category -> true when collapsed
-  let historyOpen = false;
+  let expandedAll = false;
+  const expanded = {}; // category -> bool
+  let editingId = null; // null => add mode
 
-  function render(cont, comm, backFn) {
-    container = cont;
-    commission = comm;
-    onBack = backFn;
-    draw();
+  const el = {};
+
+  function cache() {
+    el.title = document.getElementById("detail-title");
+    el.body = document.getElementById("margin-body");
+    el.chevAll = document.getElementById("chev-all");
+    // popup
+    el.overlay = document.getElementById("item-overlay");
+    el.modal = document.getElementById("item-modal");
+    el.modalTitle = document.getElementById("item-modal-title");
+    el.category = document.getElementById("i-category");
+    el.type = document.getElementById("i-type");
+    el.iTitle = document.getElementById("i-title");
+    el.desc = document.getElementById("i-description");
+    el.link = document.getElementById("i-link");
+    el.expected = document.getElementById("i-expected");
+    el.effective = document.getElementById("i-effective");
+    el.error = document.getElementById("item-error");
+    el.removeBtn = document.getElementById("item-remove");
   }
 
-  function draw() {
-    const v = Data.getVehicle(commission);
-    const categories = Data.getCategories(commission);
-    const title = v ? `${commission} - ${escapeWithBr(v.vehicle).replace(/<br>/g, ' ')}` : commission;
-
-    // Default all categories collapsed on first draw (FR-026).
-    categories.forEach(c => { if (!(c in collapsed)) collapsed[c] = true; });
-    const allCollapsed = categories.every(c => collapsed[c]);
-
-    const total = Data.totalMargin(commission);
-    const pct = Data.marginPercent(commission);
-
-    container.innerHTML = `
-      <div class="layout">
-        ${railHtml()}
-        <div class="content">
-          <div class="topbar">
-            <div class="crumbs">
-              <span class="back">&larr; Modules</span>
-              <span class="sep">/</span><a href="#" id="crumb-list">Sold vehicles</a>
-              <span class="sep">/</span>${escapeHtml(title)}
-            </div>
-            <div class="topbar-actions">
-              <button class="btn btn-primary" id="add-new">+ Add new</button>
-              <button class="kebab">&#8942;</button>
-            </div>
-          </div>
-
-          <div class="tabs">
-            ${['Info', 'Media', 'Details', 'Publish', 'Appraisal', 'Commission', 'Offers', 'Contracts']
-              .map(t => `<span class="tab">${t}</span>`).join('')}
-            <span class="tab active">Margin</span>
-          </div>
-
-          <div class="panel" style="margin-top:22px;">
-            <table class="margin-table">
-              <thead>
-                <tr>
-                  <th><span class="chev header-chev ${allCollapsed ? 'collapsed' : ''}" id="toggle-all">&#9660;</span>Item</th>
-                  <th class="num">Margin</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${categories.map(cat => categoryHtml(cat)).join('')}
-                <tr class="margin-total-row">
-                  <td>MARGIN:</td>
-                  <td class="num">${fmtMoney(total)}<span class="margin-pct">(${pct.toFixed(2)}%)</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          ${historyHtml()}
-        </div>
-      </div>
-    `;
-    wire();
+  // ----- calculation helpers -----
+  function categoryExpectedSum(cat, lines) {
+    // Bonuses & Promotions: 0 stays 0. Other categories: fall back to effective when expected is 0.
+    if (cat === "Bonuses & Promotions") {
+      return lines.reduce((s, l) => s + l.expected, 0);
+    }
+    return lines.reduce((s, l) => s + (l.expected !== 0 ? l.expected : l.effective), 0);
+  }
+  function categoryEffectiveSum(lines) {
+    return lines.reduce((s, l) => s + l.effective, 0);
+  }
+  function purchasePrice() {
+    const lines = Store.getItems(commission);
+    const p = lines.find(
+      (l) => /purchase/i.test(l.category) && /purchase price/i.test(l.title)
+    );
+    if (!p) return 0;
+    return p.effective !== 0 ? p.effective : p.expected;
   }
 
-  function railHtml() {
-    return `<div class="rail">
-      <div class="rail-logo"></div>
-      ${Array.from({ length: 12 }).map((_, i) =>
-        `<div class="rail-dot ${i === 8 ? 'active' : ''}"></div>`).join('')}
-    </div>`;
-  }
+  function render() {
+    const vehicle = Store.getVehicle(commission);
+    const name = vehicle ? vehicle.vehicle.replace(/<br>/g, " ") : "";
+    el.title.innerHTML = `&larr;&nbsp; Modules&nbsp; /&nbsp; Sold vehicles&nbsp; /&nbsp; ${commission} - ${name}`;
 
-  function categoryHtml(cat) {
-    const items = Data.getItems(commission).filter(it => it.category === cat);
-    const sum = Data.categorySum(commission, cat);
-    const isCollapsed = collapsed[cat];
-    const head = `<tr class="cat-row" data-cat="${escapeHtml(cat)}">
-      <td><span class="chev ${isCollapsed ? 'collapsed' : ''}">&#9660;</span>${escapeHtml(cat)}</td>
-      <td class="num ${sum < 0 ? 'neg' : ''}">${fmtMoney(sum)}</td>
-    </tr>`;
-    if (isCollapsed) return head;
-    const rows = items.map(itemHtml).join('');
-    return head + rows;
-  }
+    const categories = Store.getCategories(commission);
+    el.body.innerHTML = "";
 
-  function itemHtml(it) {
-    const manual = it.isManual;
-    const expected = it.isExpected
-      ? '<span class="tag tag-expected">EXPECTED</span>' : '';
-    const manualTag = manual ? '<span class="tag tag-manual">Manual</span>' : '';
-    const doc = (manual && it.link)
-      ? `<a class="doc-link" href="${escapeHtml(it.link)}" target="_blank" rel="noopener">Document</a>` : '';
-    const editIcon = manual
-      ? `<img class="edit-icon" src="img/edit.png" alt="Edit" data-id="${it.id}" />` : '';
-    const titleClass = manual ? 'item-title' : '';
-    return `<tr class="item-row ${manual ? 'manual' : ''}">
-      <td>${editIcon}<span class="${titleClass}" data-id="${it.id}">${escapeHtml(it.title)}${manual ? ' (manual)' : ''}</span>${manualTag}${expected}${doc}</td>
-      <td class="num ${it.amount < 0 ? 'neg' : ''}">${fmtMoney(it.amount)}</td>
-    </tr>`;
-  }
+    let totalExpected = 0;
+    let totalEffective = 0;
 
-  function historyHtml() {
-    const rows = Data.getHistory(commission);
-    return `<div class="history">
-      <div class="history-head" id="history-toggle">
-        <span class="chev ${historyOpen ? '' : 'collapsed'}">&#9660;</span>History
-      </div>
-      <div class="history-body ${historyOpen ? '' : 'collapsed'}">
-        <table class="history-table">
-          <thead><tr><td>Date and time</td><td>User</td><td>Action</td></tr></thead>
-          <tbody>
-            ${rows.map(r => `<tr>
-              <td>${escapeHtml(r.when)}</td>
-              <td>${escapeHtml(r.user)}</td>
-              <td>${escapeHtml(r.action)}</td></tr>`).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>`;
-  }
+    categories.forEach((cat) => {
+      const lines = Store.getItems(commission).filter((l) => l.category === cat);
+      const catExp = categoryExpectedSum(cat, lines);
+      const catEff = categoryEffectiveSum(lines);
+      totalExpected += catExp;
+      totalEffective += catEff;
 
-  function wire() {
-    container.querySelector('#crumb-list').addEventListener('click', e => { e.preventDefault(); onBack(); });
-    container.querySelector('.crumbs .back').addEventListener('click', onBack);
-
-    container.querySelector('#add-new').addEventListener('click', () => {
-      Modal.openAdd(commission, Data.getCategories(commission), () => {
-        showToast('Item added');
-        draw();
+      const isOpen = !!expanded[cat];
+      const catRow = document.createElement("tr");
+      catRow.className = "cat-row";
+      catRow.dataset.cat = cat;
+      catRow.innerHTML = `
+        <td class="item-col">
+          <button class="chev ${isOpen ? "" : "collapsed"}">${isOpen ? "&#9660;" : "&#9654;"}</button>
+          <strong>${escapeHtml(cat)}</strong>
+        </td>
+        <td class="num">${catExp !== catEff ? Format.amountOrBlank(catExp) : ""}</td>
+        <td class="num${catExp !== catEff ? " mismatch" : ""}">${Format.amountOrBlank(catEff)}</td>`;
+      catRow.addEventListener("click", () => {
+        expanded[cat] = !expanded[cat];
+        render();
       });
+      el.body.appendChild(catRow);
+
+      if (isOpen) {
+        lines.forEach((l) => el.body.appendChild(buildLineRow(l)));
+      }
     });
 
-    container.querySelector('#toggle-all').addEventListener('click', () => {
-      const cats = Data.getCategories(commission);
-      const anyOpen = cats.some(c => !collapsed[c]);
-      cats.forEach(c => { collapsed[c] = anyOpen; }); // if any open -> collapse all, else expand all
-      draw();
-    });
+    // total row
+    const pp = Math.abs(purchasePrice());
+    const expPct = pp ? (totalExpected / pp) * 100 : 0;
+    const effPct = pp ? (totalEffective / pp) * 100 : 0;
+    const totalRow = document.createElement("tr");
+    totalRow.className = "total-row";
+    totalRow.innerHTML = `
+      <td class="item-col">MARGIN:</td>
+      <td class="num">${Format.number(totalExpected)} <span class="pct">(${Format.percent(expPct)})</span></td>
+      <td class="num">${Format.number(totalEffective)} <span class="pct">(${Format.percent(effPct)})</span></td>`;
+    el.body.appendChild(totalRow);
+  }
 
-    container.querySelectorAll('.cat-row').forEach(row => {
-      row.addEventListener('click', () => {
-        const cat = row.dataset.cat;
-        collapsed[cat] = !collapsed[cat];
-        draw();
-      });
-    });
+  function buildLineRow(l) {
+    const tr = document.createElement("tr");
+    tr.className = "line-row" + (l.manual ? " manual" : "");
 
-    container.querySelectorAll('.edit-icon, .item-title').forEach(el => {
-      el.addEventListener('click', e => {
+    const itemCell = document.createElement("td");
+    itemCell.className = "item-col line-item";
+    const wrap = document.createElement("span");
+    wrap.className = "line-item-wrap";
+
+    if (l.manual) {
+      const edit = document.createElement("img");
+      edit.src = "img/edit.png";
+      edit.className = "edit-icon";
+      edit.title = "Edit";
+      edit.addEventListener("click", (e) => {
         e.stopPropagation();
-        const id = el.dataset.id;
-        const item = Data.getItems(commission).find(x => x.id === id);
-        if (!item) return;
-        Modal.openEdit(item, Data.getCategories(commission),
-          () => { showToast('Item updated'); draw(); },
-          () => { showToast('Item removed'); draw(); });
+        openEdit(l.id);
       });
-    });
+      wrap.appendChild(edit);
 
-    container.querySelector('#history-toggle').addEventListener('click', () => {
-      historyOpen = !historyOpen;
-      draw();
+      const titleSpan = document.createElement("span");
+      titleSpan.className = "item-title-link";
+      titleSpan.textContent = l.title;
+      titleSpan.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openEdit(l.id);
+      });
+      wrap.appendChild(titleSpan);
+
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = "MANUAL";
+      wrap.appendChild(tag);
+
+      if (l.docUrl) {
+        const doc = document.createElement("a");
+        doc.className = "doc-link";
+        doc.href = l.docUrl;
+        doc.target = "_blank";
+        doc.rel = "noopener";
+        doc.textContent = "Document";
+        wrap.appendChild(doc);
+      }
+    } else {
+      const titleSpan = document.createElement("span");
+      titleSpan.textContent = l.title;
+      wrap.appendChild(titleSpan);
+    }
+
+    itemCell.appendChild(wrap);
+    tr.appendChild(itemCell);
+
+    const expCell = document.createElement("td");
+    expCell.className = "num";
+    expCell.textContent = Format.amountOrBlank(l.expected);
+    tr.appendChild(expCell);
+
+    const effCell = document.createElement("td");
+    effCell.className = "num";
+    effCell.textContent = Format.amountOrBlank(l.effective);
+    tr.appendChild(effCell);
+
+    return tr;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"]/g, (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])
+    );
+  }
+
+  // ----- popup -----
+  function fillCategorySelect() {
+    el.category.innerHTML = "";
+    Store.allCategories().forEach((c) => {
+      const o = document.createElement("option");
+      o.value = c;
+      o.textContent = c;
+      el.category.appendChild(o);
     });
   }
 
-  return { render };
+  function openAdd() {
+    editingId = null;
+    el.modalTitle.textContent = "Add item";
+    el.removeBtn.hidden = true;
+    fillCategorySelect();
+    el.category.value = Store.allCategories()[0];
+    el.type.value = "Vehicle Revenue";
+    el.iTitle.value = "";
+    el.desc.value = "";
+    el.link.value = "";
+    el.expected.value = "";
+    el.effective.value = "";
+    el.error.hidden = true;
+    el.overlay.hidden = false;
+  }
+
+  function openEdit(id) {
+    const item = Store.getItem(id);
+    if (!item) return;
+    editingId = id;
+    el.modalTitle.textContent = "Edit item";
+    el.removeBtn.hidden = false;
+    fillCategorySelect();
+    el.category.value = item.category;
+    el.type.value = item.itemType || "Vehicle Revenue";
+    el.iTitle.value = item.title;
+    el.desc.value = item.description || "";
+    el.link.value = item.docUrl || "";
+    el.expected.value = item.expected ? item.expected : "";
+    el.effective.value = item.effective ? item.effective : "";
+    el.error.hidden = true;
+    el.overlay.hidden = false;
+  }
+
+  function closePopup() {
+    el.overlay.hidden = true;
+    editingId = null;
+  }
+
+  function save() {
+    const category = el.category.value;
+    const title = el.iTitle.value.trim();
+    if (!category) {
+      showError("Category is required.");
+      return;
+    }
+    if (!title) {
+      showError("Title is required.");
+      return;
+    }
+    const data = {
+      commission: commission,
+      category: category,
+      itemType: el.type.value,
+      title: title,
+      description: el.desc.value.trim(),
+      docUrl: el.link.value.trim(),
+      expected: el.expected.value === "" ? 0 : parseFloat(el.expected.value),
+      effective: el.effective.value === "" ? 0 : parseFloat(el.effective.value),
+      manual: true,
+    };
+    if (editingId == null) {
+      Store.addItem(data);
+    } else {
+      Store.updateItem(editingId, data);
+    }
+    expanded[category] = true;
+    closePopup();
+    render();
+  }
+
+  function remove() {
+    if (editingId != null) {
+      Store.removeItem(editingId);
+      closePopup();
+      render();
+    }
+  }
+
+  function showError(msg) {
+    el.error.textContent = msg;
+    el.error.hidden = false;
+  }
+
+  function initPopup() {
+    document.getElementById("add-new").addEventListener("click", openAdd);
+    document.getElementById("item-close").addEventListener("click", closePopup);
+    document.getElementById("item-cancel").addEventListener("click", closePopup);
+    document.getElementById("item-save").addEventListener("click", save);
+    el.removeBtn.addEventListener("click", remove);
+    el.overlay.addEventListener("click", (e) => {
+      if (e.target === el.overlay) closePopup();
+    });
+
+    // history toggle
+    const histToggle = document.getElementById("history-toggle");
+    const histContent = document.getElementById("history-content");
+    const histChev = document.getElementById("chev-history");
+    histToggle.addEventListener("click", () => {
+      const show = histContent.hidden;
+      histContent.hidden = !show;
+      histChev.innerHTML = show ? "&#9660;" : "&#9654;";
+    });
+
+    // expand/collapse all
+    el.chevAll.addEventListener("click", () => {
+      expandedAll = !expandedAll;
+      Store.getCategories(commission).forEach((c) => (expanded[c] = expandedAll));
+      el.chevAll.innerHTML = expandedAll ? "&#9660;" : "&#9654;";
+      render();
+    });
+  }
+
+  let initialized = false;
+
+  function open(com) {
+    commission = com;
+    if (!initialized) {
+      cache();
+      initPopup();
+      initialized = true;
+    }
+    // default collapsed
+    expandedAll = false;
+    el.chevAll.innerHTML = "&#9654;";
+    Store.getCategories(commission).forEach((c) => (expanded[c] = false));
+    // reset history collapsed
+    document.getElementById("history-content").hidden = true;
+    document.getElementById("chev-history").innerHTML = "&#9654;";
+    render();
+  }
+
+  return { open };
 })();

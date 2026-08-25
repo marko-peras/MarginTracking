@@ -1,31 +1,32 @@
-/* ==========================================================================
-   Margin Tracking App — Router & bootstrap
-   ========================================================================== */
-
+// App bootstrap + view routing
 (function () {
-  const app = document.getElementById('app');
+  const listView = document.getElementById("list-view");
+  const detailView = document.getElementById("detail-view");
 
   function showList() {
-    ListView.render(app, showDetail);
+    detailView.hidden = true;
+    listView.hidden = false;
+    ListView.refresh();
   }
 
   function showDetail(commission) {
-    DetailView.render(app, commission, showList);
-    window.scrollTo(0, 0);
+    listView.hidden = true;
+    detailView.hidden = false;
+    DetailView.open(commission);
   }
 
-  async function boot() {
-    try {
-      await Data.init();
-      showList();
-    } catch (e) {
-      console.error(e);
-      app.innerHTML = `<div class="empty">
-        Failed to load data. Serve this folder over HTTP (e.g. <code>python3 -m http.server 8765</code>)
-        and open the app from <code>http://localhost:8765/</code>.<br><br>${escapeHtml(e.message)}
-      </div>`;
-    }
+  async function start() {
+    await Store.init();
+    ListView.init(showDetail);
+
+    // Back navigation from detail title
+    document.getElementById("detail-title").addEventListener("click", showList);
+    showList();
   }
 
-  document.addEventListener('DOMContentLoaded', boot);
+  start().catch((err) => {
+    console.error(err);
+    document.getElementById("vehicle-body").innerHTML =
+      '<tr class="empty-row"><td colspan="14">Failed to load data. Serve the folder over HTTP and reload.</td></tr>';
+  });
 })();
