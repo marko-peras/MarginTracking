@@ -115,11 +115,16 @@ html, body {
 .vehicle-name { line-height: 1.35; white-space: normal; min-width: 180px; }
 .details-icon { width: 20px; height: 20px; cursor: pointer; vertical-align: middle; }
 .empty-row td { text-align: center; color: var(--muted); padding: 30px; }
+.grid tfoot td {
+  padding: 0; background: #fff; border-bottom: none; position: sticky; bottom: 0; z-index: 1;
+  border-top: 1px solid var(--border); white-space: normal;
+}
+.grid tfoot tr:hover { background: #fff; }
 
 /* ---------- Pager ---------- */
 .pager {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 20px; border-top: 1px solid var(--border); background: var(--page-bg); flex-wrap: wrap; gap: 12px;
+  padding: 12px 20px; background: #fff; flex-wrap: wrap; gap: 12px;
 }
 .pager-info { color: var(--muted); }
 .pager-controls { display: flex; align-items: center; gap: 10px; }
@@ -165,6 +170,8 @@ html, body {
 .margin-table .num { text-align: right; white-space: nowrap; }
 .margin-table .item-col { text-align: left; }
 .margin-table td.mismatch { color: var(--danger); }
+.margin-table .col-closed { text-align: center; width: 5%; }
+.margin-table td.col-closed input { cursor: pointer; }
 
 .cat-row { cursor: pointer; }
 .cat-row td { font-weight: 700; }
@@ -179,12 +186,18 @@ html, body {
   margin-right: 8px; width: 16px; display: inline-block; transition: transform .12s;
 }
 .chev.collapsed { }
-.line-item-wrap { display: inline-flex; align-items: center; gap: 8px; }
+.line-item-wrap { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .edit-icon { width: 15px; height: 15px; cursor: pointer; }
+.edit-icon.disabled { cursor: default; opacity: .35; }
+.line-row.closed .item-title-link { color: inherit; cursor: default; }
 .tag {
   display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .04em;
   background: #eef1f5; border: 1px solid #cfd5de; color: #566; padding: 1px 6px; border-radius: 4px; margin-left: 6px;
 }
+.tag.open-tag { background: #fff4e5; border-color: #f0c27b; color: #b26a00; margin-left: 4px; }
+.invoice-link { color: var(--link); text-decoration: none; }
+.invoice-link:hover { text-decoration: underline; }
+.notes { color: var(--muted); font-size: 12px; margin-left: 8px; }
 .doc-link { margin-left: 10px; font-size: 12px; color: var(--link); text-decoration: none; }
 .doc-link:hover { text-decoration: underline; }
 .item-title-link { color: var(--link); cursor: pointer; }

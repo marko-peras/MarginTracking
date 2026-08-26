@@ -71,11 +71,13 @@ const DetailView = (function () {
       catRow.innerHTML = `
         <td class="item-col">
           <button class="chev ${isOpen ? "" : "collapsed"}">${isOpen ? "&#9660;" : "&#9654;"}</button>
-          <strong>${escapeHtml(cat)}</strong>
+          <strong>${decorate(cat)}</strong>
         </td>
         <td class="num">${catExp !== catEff ? Format.amountOrBlank(catExp) : ""}</td>
-        <td class="num${catExp !== catEff ? " mismatch" : ""}">${Format.amountOrBlank(catEff)}</td>`;
-      catRow.addEventListener("click", () => {
+        <td class="num${catExp !== catEff ? " mismatch" : ""}">${Format.amountOrBlank(catEff)}</td>
+        <td class="col-closed"></td>`;
+      catRow.addEventListener("click", (e) => {
+        if (e.target.closest("a")) return;
         expanded[cat] = !expanded[cat];
         render();
       });
@@ -95,38 +97,48 @@ const DetailView = (function () {
     totalRow.innerHTML = `
       <td class="item-col">MARGIN:</td>
       <td class="num">${Format.number(totalExpected)} <span class="pct">(${Format.percent(expPct)})</span></td>
-      <td class="num">${Format.number(totalEffective)} <span class="pct">(${Format.percent(effPct)})</span></td>`;
+      <td class="num">${Format.number(totalEffective)} <span class="pct">(${Format.percent(effPct)})</span></td>
+      <td class="col-closed"></td>`;
     el.body.appendChild(totalRow);
+
+    // Keep the vehicle's margins in the Vehicles list in sync with the totals.
+    Store.updateVehicleMargins(commission, totalExpected, totalEffective);
   }
 
   function buildLineRow(l) {
     const tr = document.createElement("tr");
-    tr.className = "line-row" + (l.manual ? " manual" : "");
+    const closed = l.status === "Closed";
+    tr.className = "line-row" + (l.manual ? " manual" : "") + (closed ? " closed" : "");
 
     const itemCell = document.createElement("td");
     itemCell.className = "item-col line-item";
     const wrap = document.createElement("span");
     wrap.className = "line-item-wrap";
 
+    const titleSpan = document.createElement("span");
+    titleSpan.innerHTML = decorate(l.title);
+    if (l.manual && !closed) {
+      titleSpan.className = "item-title-link";
+      titleSpan.addEventListener("click", (e) => {
+        if (e.target.closest("a")) return;
+        e.stopPropagation();
+        openEdit(l.id);
+      });
+    }
+    wrap.appendChild(titleSpan);
+
     if (l.manual) {
       const edit = document.createElement("img");
       edit.src = "img/edit.png";
-      edit.className = "edit-icon";
+      edit.className = "edit-icon" + (closed ? " disabled" : "");
       edit.title = "Edit";
-      edit.addEventListener("click", (e) => {
-        e.stopPropagation();
-        openEdit(l.id);
-      });
+      if (!closed) {
+        edit.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openEdit(l.id);
+        });
+      }
       wrap.appendChild(edit);
-
-      const titleSpan = document.createElement("span");
-      titleSpan.className = "item-title-link";
-      titleSpan.textContent = l.title;
-      titleSpan.addEventListener("click", (e) => {
-        e.stopPropagation();
-        openEdit(l.id);
-      });
-      wrap.appendChild(titleSpan);
 
       const tag = document.createElement("span");
       tag.className = "tag";
@@ -142,10 +154,13 @@ const DetailView = (function () {
         doc.textContent = "Document";
         wrap.appendChild(doc);
       }
-    } else {
-      const titleSpan = document.createElement("span");
-      titleSpan.textContent = l.title;
-      wrap.appendChild(titleSpan);
+
+      if (l.description) {
+        const notes = document.createElement("span");
+        notes.className = "notes";
+        notes.textContent = l.description;
+        wrap.appendChild(notes);
+      }
     }
 
     itemCell.appendChild(wrap);
@@ -161,7 +176,34 @@ const DetailView = (function () {
     effCell.textContent = Format.amountOrBlank(l.effective);
     tr.appendChild(effCell);
 
+    const closedCell = document.createElement("td");
+    closedCell.className = "col-closed";
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = closed;
+    cb.addEventListener("click", (e) => e.stopPropagation());
+    cb.addEventListener("change", () => {
+      Store.updateItemStatus(l.id, cb.checked ? "Closed" : "Open");
+      render();
+    });
+    closedCell.appendChild(cb);
+    tr.appendChild(closedCell);
+
     return tr;
+  }
+
+  // Turn "invoice" into a document link and "[OPEN]" into a tag (FR-030, FR-031).
+  function decorate(text) {
+    let html = escapeHtml(text);
+    html = html.replace(
+      /\[OPEN\]/g,
+      '<span class="tag open-tag">[OPEN]</span>'
+    );
+    html = html.replace(
+      /invoice/gi,
+      '<a href="data/document.pdf" target="_blank" rel="noopener" class="invoice-link">$&</a>'
+    );
+    return html;
   }
 
   function escapeHtml(s) {

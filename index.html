@@ -25,6 +25,7 @@
             </button>
             <div class="kebab-menu" id="list-kebab-menu" hidden>
               <button id="export-booking" class="kebab-item" disabled>Export booking data</button>
+              <button id="export-margin" class="kebab-item" disabled>Export margin data</button>
             </div>
           </div>
         </header>
@@ -58,29 +59,35 @@
                 <th>Seller</th>
                 <th class="num">Expected Margin</th>
                 <th class="num">Effective Margin</th>
+                <th>Calculation Status</th>
                 <th class="col-details"></th>
               </tr>
             </thead>
             <tbody id="vehicle-body"></tbody>
+            <tfoot>
+              <tr>
+                <td colspan="15">
+                  <div class="pager">
+                    <div class="pager-info" id="pager-info">0 - 0 / 0</div>
+                    <div class="pager-controls">
+                      <label for="page-size">Per page:</label>
+                      <select id="page-size">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="All">All</option>
+                      </select>
+                      <button class="pg-btn" id="pg-first" title="First">&laquo;</button>
+                      <button class="pg-btn" id="pg-prev" title="Previous">&lsaquo;</button>
+                      <span class="pager-pages" id="pager-pages">1 / 1</span>
+                      <button class="pg-btn" id="pg-next" title="Next">&rsaquo;</button>
+                      <button class="pg-btn" id="pg-last" title="Last">&raquo;</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tfoot>
           </table>
-        </div>
-
-        <div class="pager">
-          <div class="pager-info" id="pager-info">0 - 0 / 0</div>
-          <div class="pager-controls">
-            <label for="page-size">Per page:</label>
-            <select id="page-size">
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="All">All</option>
-            </select>
-            <button class="pg-btn" id="pg-first" title="First">&laquo;</button>
-            <button class="pg-btn" id="pg-prev" title="Previous">&lsaquo;</button>
-            <span class="pager-pages" id="pager-pages">1 / 1</span>
-            <button class="pg-btn" id="pg-next" title="Next">&rsaquo;</button>
-            <button class="pg-btn" id="pg-last" title="Last">&raquo;</button>
-          </div>
         </div>
       </section>
 
@@ -111,9 +118,10 @@
         <div class="detail-body">
           <table class="margin-table" id="margin-table">
             <colgroup>
-              <col style="width:70%" />
+              <col style="width:65%" />
               <col style="width:15%" />
               <col style="width:15%" />
+              <col style="width:5%" />
             </colgroup>
             <thead>
               <tr>
@@ -123,6 +131,7 @@
                 </th>
                 <th class="num">Expected Margin</th>
                 <th class="num">Effective Margin</th>
+                <th class="col-closed">Closed</th>
               </tr>
             </thead>
             <tbody id="margin-body"></tbody>
@@ -177,6 +186,9 @@
         <label>Seller
           <select id="f-seller"></select>
         </label>
+        <label>Calculation status
+          <select id="f-calc"></select>
+        </label>
         <fieldset class="range">
           <legend>Date sold</legend>
           <label>From <input type="date" id="f-date-from" /></label>
@@ -224,7 +236,7 @@
         <label class="field">Title*
           <input type="text" id="i-title" maxlength="100" />
         </label>
-        <label class="field">Description
+        <label class="field">Notes
           <textarea id="i-description" maxlength="255" rows="3"></textarea>
         </label>
         <label class="field">Link to document

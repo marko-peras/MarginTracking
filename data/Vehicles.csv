@@ -1,11 +1,11 @@
-﻿Vehicle;Type;Condition;Status;VIN;;Commission;;Body;Fuel;Date sold;Seller;Expected Margin;Effective Margin
-Toyota Yaris Cross<br>1.5 VVT-i HSD Trend;Personal;Used;Customer;JTDKHCEB60B021183;;U-0000000675-99999;;SUV;FHGE;15.05.2025;John Doe;800.00;-200.00
-Toyota Yaris Cross<br>1.5 VVT-i HSD Trend;Personal;New;Customer;JTDKHCEB60B021183;;N-0000000566-99999;;SUV;FHGE;01.02.2022;John Doe;5300.00;3300.00
-Toyota Corolla<br>1.5 VVT-i HSD Trend;Personal;Used;Stock;JTDKHCEB60B021175;;U-0000000756-99999;;Limousine;PHGE;-;Max Mustermann;1000.00;0.00
-Toyota Aygo X<br>1.0 VVT-i HSD Trend;Personal;New;Stock;JTDKHCEB60B021190;;N-0000000867-99999;;Small car;FHGE;-;John Doe;5000.00;3000.00
-Toyota C-HR<br>1.8 VVT-i HSD Trend;Personal;Used;Customer;JTDKHCEB60B021121;;U-0000000321-99999;;SUV;FHGE;30.04.2024;Janine Specimen;700.00;-300.00
-Toyota RAV4<br>2.0 VVT-i HSD Trend;Personal;New;Customer;JTDKHCEB60B021128;;N-0000000457-99999;;SUV;PHGE;03.04.2023;John Doe;5100.00;3100.00
-Lexus LBX<br>1.5 VVT-i HSD;Personal;Used;Customer;JTDKHCEB60B021137;;U-0000000811-99999;;SUV;FHGE;20.10.2020;Max Mustermann;1000.00;0.00
-Lexus UX<br>2.0 VVT-i HSD;Personal;New;Pipeline;JTDKHCEB60B021142;;N-0000000976-99999;;SUV;PHGE;-;John Doe;5900.00;3900.00
-Lexus NX<br>1.8 VVT-i HSD;Personal;Used;Customer;JTDKHCEB60B021155;;U-0000000545-99999;;SUV;FHGE;21.08.2019;Janine Specimen;500.00;-500.00
-Lexus UX<br>1.8 VVT-i HSD;Personal;New;Customer;JTDKHCEB60B021164;;N-0000000526-99999;;SUV;FHGE;28.07.2020;John Doe;5500.00;3500.00
+﻿Vehicle;Type;Condition;Status;VIN;Commission;Body;Fuel;Date sold;Seller;Expected Margin;Effective Margin;Calculation Status 
+Toyota Yaris Cross<br>1.5 VVT-i HSD Trend;Personal;Used;Customer;JTDKHCEB60B021183;U-0000000675-99999;SUV;FHGE;15.05.2025;John Doe;800.00;-200.00;Open
+Toyota Yaris Cross<br>1.5 VVT-i HSD Trend;Personal;New;Customer;JTDKHCEB60B021183;N-0000000566-99999;SUV;FHGE;01.02.2022;John Doe;5300.00;3300.00;Open
+Toyota Corolla<br>1.5 VVT-i HSD Trend;Personal;Used;Stock;JTDKHCEB60B021175;U-0000000756-99999;Limousine;PHGE;-;Max Mustermann;1000.00;0.00;Open
+Toyota Aygo X<br>1.0 VVT-i HSD Trend;Personal;New;Stock;JTDKHCEB60B021190;N-0000000867-99999;Small car;FHGE;-;John Doe;5000.00;3000.00;Open
+Toyota C-HR<br>1.8 VVT-i HSD Trend;Personal;Used;Customer;JTDKHCEB60B021121;U-0000000321-99999;SUV;FHGE;30.04.2024;Janine Specimen;700.00;-300.00;Open
+Toyota RAV4<br>2.0 VVT-i HSD Trend;Personal;New;Customer;JTDKHCEB60B021128;N-0000000457-99999;SUV;PHGE;03.04.2023;John Doe;5100.00;3100.00;Open
+Lexus LBX<br>1.5 VVT-i HSD;Personal;Used;Customer;JTDKHCEB60B021137;U-0000000811-99999;SUV;FHGE;20.10.2020;Max Mustermann;1000.00;0.00;Open
+Lexus UX<br>2.0 VVT-i HSD;Personal;New;Pipeline;JTDKHCEB60B021142;N-0000000976-99999;SUV;PHGE;-;John Doe;5900.00;3900.00;Open
+Lexus NX<br>1.8 VVT-i HSD;Personal;Used;Customer;JTDKHCEB60B021155;U-0000000545-99999;SUV;FHGE;21.08.2019;Janine Specimen;500.00;-500.00;Open
+Lexus UX<br>1.8 VVT-i HSD;Personal;New;Customer;JTDKHCEB60B021164;N-0000000526-99999;SUV;FHGE;28.07.2020;John Doe;5500.00;3500.00;Open

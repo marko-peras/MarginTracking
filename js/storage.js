@@ -39,13 +39,14 @@ const Store = (function () {
         condition: c[2] || "",
         status: c[3] || "",
         vin: c[4] || "",
-        commission: c[6] || "",
-        body: c[8] || "",
-        fuel: c[9] || "",
-        dateSold: c[10] || "",
-        seller: c[11] || "",
-        expectedMargin: Format.parseAmount(c[12]),
-        effectiveMargin: Format.parseAmount(c[13]),
+        commission: (c[5] || "").trim(),
+        body: c[6] || "",
+        fuel: c[7] || "",
+        dateSold: c[8] || "",
+        seller: c[9] || "",
+        expectedMargin: Format.parseAmount(c[10]),
+        effectiveMargin: Format.parseAmount(c[11]),
+        calcStatus: (c[12] || "Open").trim(),
       };
     });
   }
@@ -56,6 +57,7 @@ const Store = (function () {
     return lines.map((line) => {
       const c = line.split(";");
       const title = (c[2] || "").trim();
+      const status = (c[5] || "Open").trim();
       return {
         id: nextId++,
         commission: (c[0] || "").trim(),
@@ -66,6 +68,7 @@ const Store = (function () {
         itemType: "",
         expected: Format.parseAmount(c[3]),
         effective: Format.parseAmount(c[4]),
+        status: status === "Closed" ? "Closed" : "Open",
         manual: /\(manual\)/i.test(title),
       };
     });
@@ -86,8 +89,17 @@ const Store = (function () {
       ]);
       vehicles = parseVehicles(vText);
       items = parseItems(iText);
+      vehicles.forEach((v) => recomputeVehicleStatus(v.commission));
       persist();
     }
+  }
+
+  // A vehicle is "Closed" only when all its line items are closed.
+  function recomputeVehicleStatus(commission) {
+    const its = items.filter((i) => i.commission === commission);
+    const v = vehicles.find((x) => x.commission === commission);
+    if (!v || its.length === 0) return;
+    v.calcStatus = its.every((i) => i.status === "Closed") ? "Closed" : "Open";
   }
 
   function persist() {
@@ -122,8 +134,9 @@ const Store = (function () {
   }
 
   function addItem(data) {
-    const item = Object.assign({ id: nextId++, manual: true }, data);
+    const item = Object.assign({ id: nextId++, manual: true, status: "Open" }, data);
     items.push(item);
+    recomputeVehicleStatus(item.commission);
     persist();
     return item;
   }
@@ -132,18 +145,39 @@ const Store = (function () {
     const item = items.find((i) => i.id === id);
     if (item) {
       Object.assign(item, data);
+      recomputeVehicleStatus(item.commission);
       persist();
     }
     return item;
   }
 
   function removeItem(id) {
+    const item = items.find((i) => i.id === id);
     items = items.filter((i) => i.id !== id);
+    if (item) recomputeVehicleStatus(item.commission);
     persist();
+  }
+
+  function updateItemStatus(id, status) {
+    const item = items.find((i) => i.id === id);
+    if (item) {
+      item.status = status === "Closed" ? "Closed" : "Open";
+      recomputeVehicleStatus(item.commission);
+      persist();
+    }
   }
 
   function getItem(id) {
     return items.find((i) => i.id === id) || null;
+  }
+
+  function updateVehicleMargins(commission, expected, effective) {
+    const v = vehicles.find((x) => x.commission === commission);
+    if (v && (v.expectedMargin !== expected || v.effectiveMargin !== effective)) {
+      v.expectedMargin = expected;
+      v.effectiveMargin = effective;
+      persist();
+    }
   }
 
   return {
@@ -157,6 +191,8 @@ const Store = (function () {
     addItem,
     updateItem,
     removeItem,
+    updateItemStatus,
+    updateVehicleMargins,
     CATEGORY_ORDER,
   };
 })();

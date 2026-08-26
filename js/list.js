@@ -25,6 +25,7 @@ const ListView = (function () {
     el.sumExpected = document.getElementById("sum-expected");
     el.sumEffective = document.getElementById("sum-effective");
     el.exportBtn = document.getElementById("export-booking");
+    el.exportMargin = document.getElementById("export-margin");
     el.sidebar = document.getElementById("filter-sidebar");
   }
 
@@ -56,6 +57,7 @@ const ListView = (function () {
     fillSelect("f-body", BODY_OPTIONS, true);
     fillSelect("f-fuel", unique("fuel"), true);
     fillSelect("f-seller", unique("seller"), true);
+    fillSelect("f-calc", ["Open", "Closed"], true);
   }
 
   function matchesFilters(v) {
@@ -65,6 +67,7 @@ const ListView = (function () {
     if (filters.body && v.body !== filters.body) return false;
     if (filters.fuel && v.fuel !== filters.fuel) return false;
     if (filters.seller && v.seller !== filters.seller) return false;
+    if (filters.calc && v.calcStatus !== filters.calc) return false;
 
     if (filters.dateFrom || filters.dateTo) {
       const d = Format.parseDate(v.dateSold);
@@ -86,6 +89,7 @@ const ListView = (function () {
       v.type, v.condition, v.status, v.vin, v.commission,
       v.body, v.fuel, v.dateSold, v.seller,
       Format.number(v.expectedMargin), Format.number(v.effectiveMargin),
+      v.calcStatus,
     ].join(" ").toLowerCase();
     return hay.includes(searchText.toLowerCase());
   }
@@ -113,7 +117,7 @@ const ListView = (function () {
     if (pageRows.length === 0) {
       const tr = document.createElement("tr");
       tr.className = "empty-row";
-      tr.innerHTML = '<td colspan="14">No vehicles found</td>';
+      tr.innerHTML = '<td colspan="15">No vehicles found</td>';
       el.body.appendChild(tr);
     }
 
@@ -133,6 +137,7 @@ const ListView = (function () {
         <td>${v.seller}</td>
         <td class="num">${Format.number(v.expectedMargin)}</td>
         <td class="num">${Format.number(v.effectiveMargin)}</td>
+        <td>${v.calcStatus}</td>
         <td class="col-details"><img src="img/info.png" class="details-icon" title="Details" data-com="${v.commission}"></td>`;
       el.body.appendChild(tr);
     });
@@ -168,6 +173,7 @@ const ListView = (function () {
     const allChecked = pageRows.length > 0 && pageRows.every((v) => selected.has(v.commission));
     el.checkAll.checked = allChecked;
     el.exportBtn.disabled = selected.size === 0;
+    el.exportMargin.disabled = selected.size === 0;
   }
 
   function init(openDetail) {
@@ -218,6 +224,11 @@ const ListView = (function () {
       document.getElementById("export-link").click();
       menu.hidden = true;
     });
+    el.exportMargin.addEventListener("click", () => {
+      if (el.exportMargin.disabled) return;
+      exportMarginCsv();
+      menu.hidden = true;
+    });
 
     // Filter sidebar
     document.getElementById("filter-btn").addEventListener("click", () => (el.sidebar.hidden = false));
@@ -233,6 +244,33 @@ const ListView = (function () {
     return v === "" ? null : parseFloat(v);
   }
 
+  // Export selected rows as margin.csv
+  function exportMarginCsv() {
+    const cols = [
+      "Vehicle", "Type", "Condition", "Status", "VIN", "Commission", "Body",
+      "Fuel", "Date sold", "Seller", "Expected Margin", "Effective Margin", "Calculation Status",
+    ];
+    const rows = Store.getVehicles().filter((v) => selected.has(v.commission));
+    const lines = [cols.join(";")];
+    rows.forEach((v) => {
+      lines.push([
+        v.vehicle.replace(/<br>/g, " "),
+        v.type, v.condition, v.status, v.vin, v.commission, v.body,
+        v.fuel, v.dateSold, v.seller,
+        v.expectedMargin.toFixed(2), v.effectiveMargin.toFixed(2), v.calcStatus,
+      ].join(";"));
+    });
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "margin.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   function applyFilters() {
     filters = {
       type: document.getElementById("f-type").value,
@@ -241,6 +279,7 @@ const ListView = (function () {
       body: document.getElementById("f-body").value,
       fuel: document.getElementById("f-fuel").value,
       seller: document.getElementById("f-seller").value,
+      calc: document.getElementById("f-calc").value,
       dateFrom: document.getElementById("f-date-from").value ? new Date(document.getElementById("f-date-from").value) : null,
       dateTo: document.getElementById("f-date-to").value ? new Date(document.getElementById("f-date-to").value) : null,
       expFrom: num("f-exp-from"),
@@ -254,7 +293,7 @@ const ListView = (function () {
   }
 
   function clearFilters() {
-    ["f-type", "f-condition", "f-status", "f-body", "f-fuel", "f-seller",
+    ["f-type", "f-condition", "f-status", "f-body", "f-fuel", "f-seller", "f-calc",
       "f-date-from", "f-date-to", "f-exp-from", "f-exp-to", "f-eff-from", "f-eff-to"]
       .forEach((id) => (document.getElementById(id).value = ""));
     filters = {};
