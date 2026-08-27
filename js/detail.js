@@ -26,6 +26,34 @@ const DetailView = (function () {
     el.removeBtn = document.getElementById("item-remove");
   }
 
+  // Display order for the margin table; "Internal costs" and "Services" are merged.
+  const DISPLAY_ORDER = [
+    "Vehicle sale (outgoing invoice)",
+    "Vehicle purchase (incoming invoice)",
+    "Internal costs & Services",
+    "Bonuses & Promotions",
+    "Other",
+  ];
+
+  function displayCategory(rawCat) {
+    if (rawCat === "Internal costs" || rawCat === "Services") {
+      return "Internal costs & Services";
+    }
+    return rawCat;
+  }
+
+  // Display categories that actually have line items, in DISPLAY_ORDER.
+  function displayedCategories() {
+    const present = new Set(
+      Store.getItems(commission).map((l) => displayCategory(l.category))
+    );
+    const ordered = DISPLAY_ORDER.filter((c) => present.has(c));
+    present.forEach((c) => {
+      if (!ordered.includes(c)) ordered.push(c);
+    });
+    return ordered;
+  }
+
   // ----- calculation helpers -----
   function categoryExpectedSum(cat, lines) {
     // Bonuses & Promotions: 0 stays 0. Other categories: fall back to effective when expected is 0.
@@ -51,14 +79,14 @@ const DetailView = (function () {
     const name = vehicle ? vehicle.vehicle.replace(/<br>/g, " ") : "";
     el.title.innerHTML = `&larr;&nbsp; Modules&nbsp; /&nbsp; Sold vehicles&nbsp; /&nbsp; ${commission} - ${name}`;
 
-    const categories = Store.getCategories(commission);
+    const categories = displayedCategories();
     el.body.innerHTML = "";
 
     let totalExpected = 0;
     let totalEffective = 0;
 
     categories.forEach((cat) => {
-      const lines = Store.getItems(commission).filter((l) => l.category === cat);
+      const lines = Store.getItems(commission).filter((l) => displayCategory(l.category) === cat);
       const catExp = categoryExpectedSum(cat, lines);
       const catEff = categoryEffectiveSum(lines);
       totalExpected += catExp;
@@ -224,12 +252,12 @@ const DetailView = (function () {
   ];
 
   function selectableCategories() {
-    const present = Store.getCategories(commission).filter(
+    const present = displayedCategories().filter(
       (c) => !EXCLUDED_CATEGORIES.includes(c)
     );
-    // Fall back to canonical list (minus excluded) so the dropdown is never empty.
+    // Fall back to canonical display list (minus excluded) so the dropdown is never empty.
     if (present.length === 0) {
-      return Store.allCategories().filter((c) => !EXCLUDED_CATEGORIES.includes(c));
+      return DISPLAY_ORDER.filter((c) => !EXCLUDED_CATEGORIES.includes(c));
     }
     return present;
   }
@@ -351,7 +379,7 @@ const DetailView = (function () {
     // expand/collapse all
     el.chevAll.addEventListener("click", () => {
       expandedAll = !expandedAll;
-      Store.getCategories(commission).forEach((c) => (expanded[c] = expandedAll));
+      displayedCategories().forEach((c) => (expanded[c] = expandedAll));
       el.chevAll.innerHTML = expandedAll ? "&#9660;" : "&#9654;";
       render();
     });
@@ -369,7 +397,7 @@ const DetailView = (function () {
     // default collapsed
     expandedAll = false;
     el.chevAll.innerHTML = "&#9654;";
-    Store.getCategories(commission).forEach((c) => (expanded[c] = false));
+    displayedCategories().forEach((c) => (expanded[c] = false));
     // reset history collapsed
     document.getElementById("history-content").hidden = true;
     document.getElementById("chev-history").innerHTML = "&#9654;";
