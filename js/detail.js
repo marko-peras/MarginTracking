@@ -107,7 +107,9 @@ const DetailView = (function () {
 
   function buildLineRow(l) {
     const tr = document.createElement("tr");
-    const closed = l.status === "Closed";
+    // Vehicle sale/purchase items are always closed and cannot be toggled.
+    const forcedClosed = l.category === "Vehicle sale (outgoing invoice)" || l.category === "Vehicle purchase (incoming invoice)";
+    const closed = forcedClosed || l.status === "Closed";
     tr.className = "line-row" + (l.manual ? " manual" : "") + (closed ? " closed" : "");
 
     const itemCell = document.createElement("td");
@@ -181,11 +183,14 @@ const DetailView = (function () {
     const cb = document.createElement("input");
     cb.type = "checkbox";
     cb.checked = closed;
+    cb.disabled = forcedClosed;
     cb.addEventListener("click", (e) => e.stopPropagation());
-    cb.addEventListener("change", () => {
-      Store.updateItemStatus(l.id, cb.checked ? "Closed" : "Open");
-      render();
-    });
+    if (!forcedClosed) {
+      cb.addEventListener("change", () => {
+        Store.updateItemStatus(l.id, cb.checked ? "Closed" : "Open");
+        render();
+      });
+    }
     closedCell.appendChild(cb);
     tr.appendChild(closedCell);
 
@@ -213,9 +218,25 @@ const DetailView = (function () {
   }
 
   // ----- popup -----
+  const EXCLUDED_CATEGORIES = [
+    "Vehicle sale (outgoing invoice)",
+    "Vehicle purchase (incoming invoice)",
+  ];
+
+  function selectableCategories() {
+    const present = Store.getCategories(commission).filter(
+      (c) => !EXCLUDED_CATEGORIES.includes(c)
+    );
+    // Fall back to canonical list (minus excluded) so the dropdown is never empty.
+    if (present.length === 0) {
+      return Store.allCategories().filter((c) => !EXCLUDED_CATEGORIES.includes(c));
+    }
+    return present;
+  }
+
   function fillCategorySelect() {
     el.category.innerHTML = "";
-    Store.allCategories().forEach((c) => {
+    selectableCategories().forEach((c) => {
       const o = document.createElement("option");
       o.value = c;
       o.textContent = c;
@@ -228,7 +249,7 @@ const DetailView = (function () {
     el.modalTitle.textContent = "Add item";
     el.removeBtn.hidden = true;
     fillCategorySelect();
-    el.category.value = Store.allCategories()[0];
+    el.category.value = selectableCategories()[0];
     el.type.value = "Vehicle Revenue";
     el.iTitle.value = "";
     el.desc.value = "";
